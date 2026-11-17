@@ -6,6 +6,11 @@
           "version": "1.8.0",
           "update_link": "https://github.com/GPrabhanjana/cue-enhanced-attendance/releases/download/v1.8.0/cue-enhanced-attendance-1.8.0.xpi",
           "update_hash": "sha256:b062891745cef1c97070a4430ef10b79dd557103141c8bc543f9ce7a0b79b2c4"
+        },
+        {
+          "version": "1.8.1",
+          "update_link": "https://github.com/GPrabhanjana/cue-enhanced-attendance/releases/download/v1.8.1/cue-enhanced-attendance-1.8.1.xpi",
+          "update_hash": "sha256:190cee7a3de31af52c3643eb08f4a4f73b09bcd9d26b4483afe9d718b6f43b36"
         }
       ]
     }
