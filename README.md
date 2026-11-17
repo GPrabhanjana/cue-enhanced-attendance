@@ -6,13 +6,9 @@ Unofficial Firefox add-on for the CHRIST University **CUE** student portal. It s
 
 ## Install (Firefox 140+)
 
-1. Open the **[latest release](https://github.com/GPrabhanjana/cue-enhanced-attendance/releases/latest)** and download the `.xpi` file.
-2. Install it in one of two ways:
-   - drag the `.xpi` onto any Firefox window, or
-   - go to `about:addons`, click ⚙ (top right), choose **Install Add-on From File…**, and pick the `.xpi`.
-3. Click **Add** when Firefox asks.
+Install it from **[addons.mozilla.org](https://addons.mozilla.org/firefox/addon/cue-enhanced-attendance/)** and click **Add to Firefox**. Firefox keeps it updated automatically.
 
-New versions install automatically. Firefox checks about once a day. To check now, go to `about:addons` and click ⚙ → **Check for Updates**.
+If you installed an earlier version from this repo's Releases page, you don't need to do anything. It moves to the addons.mozilla.org version on its own.
 
 ## What it adds
 
@@ -42,7 +38,7 @@ These follow the portal's *Attendance Information* box:
 
 - **Permissions:** only `storage`, and it runs only on `cue.christuniversity.in`.
 - **Saved locally:** your target %, the *Count medical* setting, and the last subject you opened.
-- **Network:** it makes no network requests. Firefox itself checks this repo's `updates.json` for new versions.
+- **Network:** it makes no network requests. Updates come through addons.mozilla.org.
 
 ## Report a bug
 
@@ -54,7 +50,8 @@ Use **Report a bug** in the add-on's toolbar popup. It pre-fills the version and
 
 ```
 extension/        the add-on (load this folder for testing)
-updates.json      update manifest Firefox polls (maintained by the release workflow)
+amo-metadata.json listing details sent to addons.mozilla.org
+updates.json      only used by old self-hosted installs (v1.8.x)
 .github/workflows/release.yml
 ```
 
@@ -63,25 +60,14 @@ To test locally, go to `about:debugging#/runtime/this-firefox`, click **Load Tem
 ### Releasing
 
 1. Change code in `extension/`.
-2. Bump `"version"` in `extension/manifest.json` (e.g. `1.8.0` → `1.8.1`). Mozilla rejects a version number it has already signed.
+2. Bump `"version"` in `extension/manifest.json` (e.g. `1.9.0` → `1.9.1`). Mozilla rejects a version number it has already received.
 3. Push to `main`.
 
-The **Release** workflow then:
-1. lints the add-on
-2. has Mozilla sign it
-3. publishes `vX.Y.Z` with the signed `.xpi`
-4. adds the version to `updates.json`
+The **Release** workflow lints the add-on, submits it to addons.mozilla.org, and records a GitHub Release as a changelog entry. Mozilla signs it, and Firefox delivers it to every installed copy. Pushes that don't change the version are skipped.
 
-Installed copies pick up the new version within about a day. Pushes that don't change the version are skipped.
+`amo-metadata.json` holds the listing text (summary, description, category, licence, notes for reviewers). You can also edit the listing, and add screenshots, on the AMO developer dashboard.
 
 One-time setup: add the repository secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET`, from addons.mozilla.org → Developer Hub → *Manage API Keys*.
-
-### Moving to a public AMO listing later
-
-1. Release a final self-hosted version **without** `update_url` in `extension/manifest.json`.
-2. Submit a **higher** version as *listed* on addons.mozilla.org.
-
-Firefox then moves existing installs over to the listed version automatically.
 
 ## License
 

@@ -1,0 +1,25 @@
+{
+  "slug": "cue-enhanced-attendance",
+  "categories": {
+    "firefox": [
+      "other"
+    ]
+  },
+  "summary": {
+    "en-US": "Unofficial Firefox add-on for the CHRIST University CUE portal. Shows your effective attendance and how many classes you need to hit your target, overall and per subject. Runs entirely in your browser."
+  },
+  "description": {
+    "en-US": "Adds clear attendance planning to the CHRIST University CUE student portal (cue.christuniversity.in).\n\n<b>Attendance page</b>\n- Effective attendance with co-curricular hours, and with medical leave when it applies\n- A Target card: set a target % and see how many more classes you need, or how many you can skip\n\n<b>View Details (per subject)</b>\n- Subject attendance, Present, Absent (co-curricular / medical / other) and the same Target card\n\n<b>Follows the portal's own rules</b>\n- Co-curricular hours are added back\n- Medical leave counts only between 74.50% and 84.49% (read from the portal)\n- A \"Count medical\" checkbox lets you ignore medical leave\n\n<b>Privacy</b>\nRuns only on cue.christuniversity.in. Makes no network requests and collects no data. Your target % is stored locally in your browser.\n\nUnofficial. Not affiliated with CHRIST (Deemed to be University). Source code: https://github.com/GPrabhanjana/cue-enhanced-attendance"
+  },
+  "homepage": {
+    "en-US": "https://github.com/GPrabhanjana/cue-enhanced-attendance"
+  },
+  "support_url": {
+    "en-US": "https://github.com/GPrabhanjana/cue-enhanced-attendance/issues"
+  },
+  "requires_payment": false,
+  "version": {
+    "license": "MIT",
+    "approval_notes": "This add-on only runs on the CHRIST University student portal (cue.christuniversity.in), which requires a student login that cannot be shared. It reads the attendance numbers already displayed on the Attendance and View Details pages and adds summary cards next to them; it makes no network requests and stores only the user's target % and settings in storage.local. Calculation logic is in content.js (plan() and pctAfter()). Source is plain, unminified JavaScript; public repo: https://github.com/GPrabhanjana/cue-enhanced-attendance"
+  }
+}

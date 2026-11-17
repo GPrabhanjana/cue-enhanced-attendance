@@ -1,11 +1,12 @@
-# Publishes a new signed Firefox build whenever the version in
-# extension/manifest.json is bumped on main.
+# Submits a new version to addons.mozilla.org (public listing) whenever the
+# version in extension/manifest.json is bumped on main.
 #
 #   1. lint the add-on
-#   2. sign it with Mozilla (self-distributed / "unlisted" channel)
-#   3. attach the signed .xpi to a GitHub Release  vX.Y.Z
-#   4. add the version to updates.json, so installed copies update themselves
+#   2. submit it to AMO on the "listed" channel (amo-metadata.json supplies
+#      the listing details the first time)
+#   3. create a GitHub Release vX.Y.Z as a changelog entry
 #
+# AMO then signs it and delivers the update to every installed copy.
 # Needs repository secrets AMO_JWT_ISSUER and AMO_JWT_SECRET
 # (addons.mozilla.org -> Developer Hub -> Manage API Keys).
 
@@ -30,15 +31,13 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Read version
         id: v
         run: |
           VERSION=$(jq -r .version extension/manifest.json)
-          ADDON_ID=$(jq -r .browser_specific_settings.gecko.id extension/manifest.json)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "id=$ADDON_ID" >> "$GITHUB_OUTPUT"
           if gh release view "v$VERSION" >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "::notice::v$VERSION is already released. Bump \"version\" in extension/manifest.json to publish a new one."
@@ -46,16 +45,16 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: steps.v.outputs.exists == 'false'
         with:
           node-version: 22
 
       - name: Lint
         if: steps.v.outputs.exists == 'false'
-        run: npx --yes web-ext@8 lint --source-dir extension --self-hosted --warnings-as-errors
+        run: npx --yes web-ext@8 lint --source-dir extension --warnings-as-errors
 
-      - name: Sign with Mozilla (self-distributed)
+      - name: Submit to addons.mozilla.org (listed)
         if: steps.v.outputs.exists == 'false'
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
@@ -65,43 +64,22 @@ jobs:
             echo "::error::Missing AMO_JWT_ISSUER / AMO_JWT_SECRET repository secrets."
             exit 1
           fi
+          # approval-timeout 0: submit and don't wait for Mozilla's review.
           npx --yes web-ext@8 sign \
             --source-dir extension \
             --artifacts-dir dist \
-            --channel unlisted \
+            --channel listed \
+            --amo-metadata amo-metadata.json \
             --api-key "$AMO_JWT_ISSUER" \
             --api-secret "$AMO_JWT_SECRET" \
-            --approval-timeout 1800000
+            --approval-timeout 0
 
-      - name: Create GitHub release
+      - name: Create GitHub release (changelog)
         if: steps.v.outputs.exists == 'false'
-        id: rel
         run: |
           VERSION="${{ steps.v.outputs.version }}"
-          XPI=$(ls dist/*.xpi | head -n 1)
-          OUT="cue-enhanced-attendance-$VERSION.xpi"
-          mv "$XPI" "dist/$OUT"
-          SHA=$(sha256sum "dist/$OUT" | cut -d' ' -f1)
-          echo "file=$OUT" >> "$GITHUB_OUTPUT"
-          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          gh release create "v$VERSION" "dist/$OUT" \
+          gh release create "v$VERSION" \
             --target "$GITHUB_SHA" \
             --title "v$VERSION" \
-            --generate-notes
-
-      - name: Update updates.json
-        if: steps.v.outputs.exists == 'false'
-        run: |
-          VERSION="${{ steps.v.outputs.version }}"
-          LINK="https://github.com/${{ github.repository }}/releases/download/v$VERSION/${{ steps.rel.outputs.file }}"
-          jq --arg id "${{ steps.v.outputs.id }}" --arg v "$VERSION" --arg link "$LINK" \
-             --arg hash "sha256:${{ steps.rel.outputs.sha }}" \
-             '.addons[$id].updates = ([.addons[$id].updates[]? | select(.version != $v)]
-                                      + [{version: $v, update_link: $link, update_hash: $hash}])' \
-             updates.json > updates.tmp && mv updates.tmp updates.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add updates.json
-          git commit -m "Release v$VERSION: add to updates.json"
-          git pull --rebase origin main
-          git push origin HEAD:main
+            --generate-notes \
+            --notes "Submitted to [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/cue-enhanced-attendance/). Firefox installs it automatically once Mozilla has processed it."
