@@ -1,0 +1,72 @@
+/* CUE Attendance Planner - loaded by the manifest so the page's CSP can't block it */
+.cue-target { display: inline-flex; align-items: baseline; gap: 1px; font-weight: 700;
+  font-size: 1.6rem; line-height: 1; white-space: nowrap; }
+.cue-target input { all: unset; box-sizing: content-box; font: inherit; color: inherit;
+  text-align: right; min-width: 2ch; padding: 0 1px 2px; border-bottom: 1.5px dashed currentColor;
+  cursor: text; transition: border-color .15s; }
+.cue-target input:focus { border-bottom-style: solid; }
+.cue-target .pct { font-size: 1rem; font-weight: 600; opacity: .8; margin-left: 2px; }
+.cue-right { display: inline-flex; align-items: center; gap: 8px; margin: -10px 0; }
+.cue-unit { white-space: nowrap; }
+.cue-caption { margin-top: 6px; opacity: .8; }
+[data-cue-planner] .cue-caption { font-size: .9rem; line-height: 1.35; }
+.cue-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 10px; }
+[data-cue-planner] .cue-help { display: inline-flex; align-items: center; justify-content: center;
+  box-sizing: border-box; width: 15px; height: 15px; min-width: 0; padding: 0; margin: 0;
+  border-radius: 50%; border: 1.3px solid currentColor; background: none; color: inherit;
+  font: 700 10px/1 system-ui, sans-serif; opacity: .5; cursor: help; flex-shrink: 0; }
+[data-cue-planner] .cue-help:hover, [data-cue-planner] .cue-help:focus-visible { opacity: 1; outline: none; }
+.cue-med { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem;
+  opacity: .75; cursor: pointer; user-select: none; }
+.cue-med:hover { opacity: 1; }
+.cue-med input { margin: 0; width: 14px; height: 14px; accent-color: #22b07d; cursor: pointer; }
+.cue-eff { margin-top: 10px; display: flex; flex-direction: column; gap: 1px; }
+[data-cue-planner] .cue-eff, [data-cue-planner].cue-eff, [data-cue-planner] .cue-eff .ln { font-size: .78rem !important; line-height: 1.4 !important; }
+.cue-eff .ln { display: flex; justify-content: space-between; gap: 10px; white-space: nowrap; }
+.cue-eff b { font-weight: 700; }
+.cue-eff .dim { opacity: .55; font-weight: 500; font-size: .9em; }
+
+.cue-tip { position: fixed; z-index: 2147483000; max-width: 280px; padding: 10px 12px;
+  border-radius: 10px; background: #0f172a; color: #e2e8f0; border: 1px solid #334155;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45); font: 12.5px/1.45 Inter, system-ui, sans-serif;
+  pointer-events: none; }
+.cue-tip b { color: #fff; }
+.cue-tip p { margin: 0 0 6px; }
+.cue-tip p:last-child { margin: 0; }
+
+.cue-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px;
+  margin: 8px 0 20px; }
+.cue-card { --fg: #e6e8ee; --muted: #9aa3b5; --bg: #161b27; --border: rgba(255,255,255,.08);
+  --track: rgba(255,255,255,.08);
+  position: relative; min-width: 0; padding: 20px 22px; border-radius: 22px; color: var(--fg);
+  background: var(--bg); border: 1px solid var(--border); font-family: inherit;
+  box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.cue-light .cue-card { --fg: #0f172a; --muted: #64748b; --bg: #fff; --border: #e2e8f0; --track: #e2e8f0; }
+.cue-card .hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.cue-card .ttl { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 1.12rem; font-weight: 500; }
+.cue-card .ttl span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cue-card .val { display: flex; align-items: baseline; gap: 6px; margin-top: 16px; white-space: nowrap; }
+.cue-card .val h4 { margin: 0; font-size: 2.1rem; font-weight: 700; line-height: 1.1; color: var(--fg); }
+.cue-card .val p, .cue-card .cue-caption, .cue-card .sub { margin: 0; color: var(--muted); }
+.cue-card .val p { font-size: 1.05rem; }
+.cue-card .cue-caption { margin-top: 6px; font-size: .95rem; }
+.cue-card .sub { margin-top: 4px; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cue-card .lines { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.cue-card .lines .ln { display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  font-size: .9rem; font-weight: 600; }
+.cue-card .lines .ln span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.cue-card .bar { height: 6px; border-radius: 3px; background: var(--track); margin-top: 12px; overflow: hidden; }
+.cue-card .bar i { display: block; height: 100%; border-radius: 3px; background: #3b82f6; }
+.cue-card .cue-eff { color: var(--muted); }
+.cue-card .cue-eff b { color: var(--fg); }
+.cue-note { margin: 8px 0 16px; padding: 10px 14px; border-radius: 12px; font-size: .9rem;
+  border: 1px dashed rgba(148,163,184,.5); color: #94a3b8; }
+  
+
+/* The row must take a full line even if the portal puts it in a flex/grid row */
+.cue-row, .cue-note { flex: 1 0 100%; width: 100%; max-width: 100%; grid-column: 1 / -1;
+  box-sizing: border-box; }
+.cue-card * { box-sizing: border-box; }
+.cue-card svg { display: inline-block; }
+.cue-card p, .cue-card h4 { letter-spacing: normal; }
