@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "CUE Enhanced Attendance",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Unofficial helper for the CHRIST University CUE portal: effective attendance (co-curricular and medical leave) and how many classes you need or can skip to reach your target. Runs only in your browser.",
   "homepage_url": "https://gprabhanjana.netlify.app/",
   "icons": {

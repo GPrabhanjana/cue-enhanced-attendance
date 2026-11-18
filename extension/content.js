@@ -90,13 +90,21 @@
     const scope = document.querySelector("main") || document.body;
     const m = scope.textContent.match(new RegExp(num + "\\s*/\\s*" + num + "\\s*hrs", "i"));
     if (!m) return null;
-    const other = readLabelled("Other Absences");
-    if (other === null) return null;
-    const cc = readLabelled("Co-Curricular") || 0;
     const present = Number(m[1]);
     const total = Number(m[2]);
-    // Anything absent that is neither co-curricular nor "other" is medical leave.
-    const med = Math.max(0, r2(total - present - cc - other));
+    const absent = Math.max(0, r2(total - present));
+    // The Absent card's breakdown rows aren't shown for every account (e.g. no
+    // co-curricular hours, or no absences), so each row is optional.
+    const cc = readLabelled("Co-Curricular") || 0;
+    let other = readLabelled("Other Absences");
+    let med = 0;
+    if (other === null) {
+      // No breakdown: everything that isn't co-curricular counts as absent.
+      other = Math.max(0, r2(absent - cc));
+    } else {
+      // Anything absent that is neither co-curricular nor "other" is medical leave.
+      med = Math.max(0, r2(absent - cc - other));
+    }
     return { present, total, cc, other, med };
   }
 
