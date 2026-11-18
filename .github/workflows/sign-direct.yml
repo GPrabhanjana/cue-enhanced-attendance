@@ -1,0 +1,61 @@
+# Manually signs the current extension/ code as a self-distributed build,
+# for direct install while the addons.mozilla.org listing is in review.
+#
+# Run it from Actions -> "Sign direct-install build" -> Run workflow, and give
+# a version LOWER than the listed one (e.g. listed 1.9.1 -> direct 1.8.2), so
+# installs move to the AMO version automatically once it's approved.
+
+name: Sign direct-install build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version for this build (must be unused and lower than the listed version)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Set version
+        run: |
+          jq --arg v "$VERSION" '.version = $v' extension/manifest.json > m.tmp && mv m.tmp extension/manifest.json
+          jq -r .version extension/manifest.json
+
+      - name: Sign with Mozilla (self-distributed)
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          npx --yes web-ext@8 lint --source-dir extension --self-hosted --warnings-as-errors
+          npx --yes web-ext@8 sign \
+            --source-dir extension \
+            --artifacts-dir dist \
+            --channel unlisted \
+            --api-key "$AMO_JWT_ISSUER" \
+            --api-secret "$AMO_JWT_SECRET" \
+            --approval-timeout 1800000
+
+      - name: Publish as a pre-release
+        run: |
+          XPI=$(ls dist/*.xpi | head -n 1)
+          OUT="cue-enhanced-attendance-$VERSION.xpi"
+          mv "$XPI" "dist/$OUT"
+          gh release create "v$VERSION" "dist/$OUT" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "v$VERSION (direct install)" \
+            --notes "Mozilla-signed build for direct install while the addons.mozilla.org listing is in review. Install from file; it updates to the addons.mozilla.org version automatically once that's approved."
